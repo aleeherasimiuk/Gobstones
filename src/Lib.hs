@@ -147,3 +147,11 @@ mientras condicion sentencias tablero
   | otherwise         = tablero
 
 
+-------------
+--Punto 4.d--
+-------------
+
+irAlBorde :: Direccion -> Sentencia
+irAlBorde direccion = mientras (puedeMoverse direccion) [mover direccion]
+
+
