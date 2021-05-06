@@ -15,9 +15,14 @@ data Celda = Celda{
 } deriving(Show)
 
 data Tablero = Tablero{
-  tamaño  :: Tamaño,
   tablero :: [Celda],
+  tamaño  :: Tamaño,
   cabezal :: Cabezal
 } deriving(Show)
+
+inicializarTablero :: Tamaño -> Tablero
+inicializarTablero (filas, columnas) = Tablero [Celda (x, y) [] | x <-[1 .. filas], y <- [1 .. columnas]] (filas, columnas) (1, 1)
+
+
 
 
