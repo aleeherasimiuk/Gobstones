@@ -17,13 +17,19 @@ data Celda = Celda{
 } deriving(Show)
 
 data Tablero = Tablero{
-  tablero :: [Celda],
+  celdas :: [Celda],
   tamaño  :: Tamaño,
   cabezal :: Cabezal
 } deriving(Show)
 
 mapCabezal :: (Cabezal -> Cabezal) -> Tablero -> Tablero
 mapCabezal f tablero = tablero{cabezal = f . cabezal $ tablero}
+
+mapCeldas :: ([Celda] -> [Celda]) -> Tablero -> Tablero
+mapCeldas f tablero = tablero{celdas = f . celdas $ tablero}
+
+mapBolita :: ([Bolita] -> [Bolita]) -> Celda -> Celda
+mapBolita f celda = celda {bolitas = f . bolitas $ celda}
 
 
 ----------
@@ -62,4 +68,18 @@ between li ls x = x >= li && x <= ls
 sumaParOrdenado :: (Int, Int) -> (Int, Int) -> (Int, Int)
 sumaParOrdenado (a, b) (c, d) = (a + c, b + d)
 
+-------------
+--Punto 3.b--
+-------------
 
+poner :: Bolita -> Tablero -> Tablero
+poner bolita tablero = mapCeldas (map (ponerBolita bolita . cabezal $ tablero)) tablero
+
+ponerBolita :: Bolita -> Cabezal -> Celda -> Celda
+ponerBolita bolita cabezal celda
+  | esEstaCelda cabezal celda = mapBolita (++ [bolita]) celda
+  | otherwise                 = celda
+
+
+esEstaCelda :: Cabezal -> Celda -> Bool
+esEstaCelda cabezal celda = posicion celda == cabezal 
