@@ -12,6 +12,7 @@ type Sentencia = Tablero -> Tablero
 type Posicion  = (Int, Int)
 type Cabezal   = (Int, Int)
 type Tamaño    = (Int, Int)
+type Condicion = (Tablero -> Bool)
 
 data Celda = Celda{
   posicion :: Posicion,
@@ -116,7 +117,7 @@ repetir cantidad sentencias = ejecutarSentencias (concat . replicate cantidad $ 
 --Punto 4.b.i--
 ---------------
 
-alternativa :: (Tablero -> Bool) -> [Sentencia] -> [Sentencia] -> Sentencia
+alternativa :: Condicion -> [Sentencia] -> [Sentencia] -> Sentencia
 alternativa condicion sentenciasSi sentenciasNo tablero
   | condicion tablero = ejecutarSentencias sentenciasSi tablero
   | otherwise         = ejecutarSentencias sentenciasNo tablero
@@ -126,17 +127,23 @@ alternativa condicion sentenciasSi sentenciasNo tablero
 --Punto 4.b.ii--
 ----------------
 
-si :: (Tablero -> Bool) -> [Sentencia] -> Sentencia
+si :: Condicion -> [Sentencia] -> Sentencia
 si condicion tablero = alternativa condicion tablero []
 
 -----------------
 --Punto 4.b.iii--
 -----------------
 
-sino :: (Tablero -> Bool) -> [Sentencia] -> Sentencia
+sino :: Condicion -> [Sentencia] -> Sentencia
 sino condicion = si (not . condicion)
 
+-------------
+--Punto 4.c--
+-------------
 
-
+mientras :: Condicion -> [Sentencia] -> Sentencia
+mientras condicion sentencias tablero
+  | condicion tablero = mientras condicion sentencias (ejecutarSentencias sentencias tablero)
+  | otherwise         = tablero
 
 
