@@ -109,8 +109,8 @@ sacarBolitaEnCelda bolita = operarSiEsLaCelda (mapBolitas (delete bolita)) bolit
 ejecutarSentencias :: [Sentencia] -> Sentencia
 ejecutarSentencias sentencias tablero = foldr ($) tablero sentencias
 
-repetir :: [Sentencia] -> Int -> Tablero -> Tablero
-repetir sentencias cantidad = ejecutarSentencias (concat . replicate cantidad $ sentencias)
+repetir :: Int -> [Sentencia] -> Tablero -> Tablero
+repetir cantidad sentencias = ejecutarSentencias (concat . replicate cantidad $ sentencias)
 
 ---------------
 --Punto 4.b.i--
@@ -120,6 +120,21 @@ alternativa :: (Tablero -> Bool) -> [Sentencia] -> [Sentencia] -> Sentencia
 alternativa condicion sentenciasSi sentenciasNo tablero
   | condicion tablero = ejecutarSentencias sentenciasSi tablero
   | otherwise         = ejecutarSentencias sentenciasNo tablero
+
+
+----------------
+--Punto 4.b.ii--
+----------------
+
+si :: (Tablero -> Bool) -> [Sentencia] -> Sentencia
+si condicion tablero = alternativa condicion tablero []
+
+-----------------
+--Punto 4.b.iii--
+-----------------
+
+sino :: (Tablero -> Bool) -> [Sentencia] -> Sentencia
+sino condicion = si (not . condicion)
 
 
 
