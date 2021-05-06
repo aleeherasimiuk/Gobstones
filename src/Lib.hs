@@ -102,7 +102,12 @@ sacarBolitaEnCelda :: Bolita -> Cabezal -> Celda -> Celda
 sacarBolitaEnCelda bolita = operarSiEsLaCelda (mapBolitas (delete bolita)) bolita
 
 
+-------------
+--Punto 4.a--
+-------------
 
+repetir :: [Sentencia] -> Int -> Tablero -> Tablero
+repetir sentencias cantidad tablero = foldr ($) tablero (concat . replicate cantidad $ sentencias)
 
 
 
