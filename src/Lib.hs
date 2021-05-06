@@ -66,10 +66,6 @@ moverCabezal Sur   = mapCabezal (sumaParOrdenado ( 0,-1))
 moverCabezal Este  = mapCabezal (sumaParOrdenado ( 1, 0))
 moverCabezal Oeste = mapCabezal (sumaParOrdenado (-1, 0))
 
-puedeMoverse :: Direccion -> Tablero -> Bool
-puedeMoverse unaDireccion tablero = betweenDupla (1, 1) (tamaño tablero) . cabezal . moverCabezal unaDireccion $ tablero
-
-
 betweenDupla :: Ord a => (a, a) -> (a, a) -> (a, a) -> Bool
 betweenDupla (lix, liy) (lsx, lsy) (x, y) = between lix lsx x && between liy lsy y
 
@@ -155,3 +151,9 @@ irAlBorde :: Direccion -> Sentencia
 irAlBorde direccion = mientras (puedeMoverse direccion) [mover direccion]
 
 
+-------------
+--Punto 5.a--
+-------------
+
+puedeMoverse :: Direccion -> Tablero -> Bool
+puedeMoverse unaDireccion tablero = betweenDupla (1, 1) (tamaño tablero) . cabezal . moverCabezal unaDireccion $ tablero
