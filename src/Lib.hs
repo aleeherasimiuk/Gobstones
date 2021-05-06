@@ -42,7 +42,8 @@ operarSiEsLaCelda f bolita cabezal celda
   | esEstaCelda cabezal celda = f celda
   | otherwise                 = celda
 
-
+esEstaCelda :: Cabezal -> Celda -> Bool
+esEstaCelda cabezal celda = posicion celda == cabezal
 ----------
 --Punto 2-
 ----------
@@ -85,8 +86,6 @@ poner = mapBolitasEnCelda ponerBolitaEnCelda
 ponerBolitaEnCelda :: Bolita -> Cabezal -> Celda -> Celda
 ponerBolitaEnCelda bolita = operarSiEsLaCelda (mapBolitas (++ [bolita])) bolita
 
-esEstaCelda :: Cabezal -> Celda -> Bool
-esEstaCelda cabezal celda = posicion celda == cabezal
 
 -------------
 --Punto 3.c--
@@ -157,3 +156,12 @@ irAlBorde direccion = mientras (puedeMoverse direccion) [mover direccion]
 
 puedeMoverse :: Direccion -> Tablero -> Bool
 puedeMoverse unaDireccion tablero = betweenDupla (1, 1) (tamaño tablero) . cabezal . moverCabezal unaDireccion $ tablero
+
+-------------
+--Punto 5.b--
+-------------
+
+hayBolita :: Bolita -> Tablero -> Bool
+hayBolita bolita tablero = elem bolita . bolitas . head . filter (esEstaCelda (cabezal tablero)) $ celdas tablero
+
+
