@@ -1,15 +1,17 @@
 module Gobstones where
+import Data.List
 
 ----------
 --Punto 1-
 ----------
 
-data Bolita = Rojo | Azul | Verde | Negro deriving(Show)
+data Bolita = Rojo | Azul | Verde | Negro deriving(Show, Eq)
 data Direccion = Norte | Sur | Este | Oeste deriving(Show)
 
-type Posicion = (Int, Int)
-type Cabezal = (Int, Int)
-type Tamaño  = (Int, Int)
+type Sentencia = Tablero -> Tablero
+type Posicion  = (Int, Int)
+type Cabezal   = (Int, Int)
+type Tamaño    = (Int, Int)
 
 data Celda = Celda{
   posicion :: Posicion,
@@ -22,14 +24,22 @@ data Tablero = Tablero{
   cabezal :: Cabezal
 } deriving(Show)
 
-mapCabezal :: (Cabezal -> Cabezal) -> Tablero -> Tablero
+mapCabezal :: (Cabezal -> Cabezal) -> Sentencia
 mapCabezal f tablero = tablero{cabezal = f . cabezal $ tablero}
 
-mapCeldas :: ([Celda] -> [Celda]) -> Tablero -> Tablero
+mapCeldas :: ([Celda] -> [Celda]) -> Sentencia
 mapCeldas f tablero = tablero{celdas = f . celdas $ tablero}
 
-mapBolita :: ([Bolita] -> [Bolita]) -> Celda -> Celda
-mapBolita f celda = celda {bolitas = f . bolitas $ celda}
+mapBolitas :: ([Bolita] -> [Bolita]) -> Celda -> Celda
+mapBolitas f celda = celda {bolitas = f . bolitas $ celda}
+
+mapBolitasEnCelda :: (Bolita -> Cabezal -> Celda -> Celda) -> Bolita -> Tablero -> Tablero
+mapBolitasEnCelda f bolita tablero = mapCeldas (map (f bolita . cabezal $ tablero)) tablero
+
+operarSiEsLaCelda :: (Celda -> Celda) -> Bolita -> Cabezal -> Celda -> Celda
+operarSiEsLaCelda f bolita cabezal celda
+  | esEstaCelda cabezal celda = f celda
+  | otherwise                 = celda
 
 
 ----------
@@ -44,12 +54,12 @@ inicializarTablero (filas, columnas) = Tablero [Celda (x, y) [] | x <-[1 .. fila
 --Punto 3.a--
 -------------
 
-mover :: Direccion -> Tablero -> Tablero
+mover :: Direccion -> Sentencia
 mover direccion tablero
   | puedeMoverse direccion tablero = moverCabezal direccion tablero
   | otherwise = error "Boom"
 
-moverCabezal :: Direccion -> Tablero -> Tablero
+moverCabezal :: Direccion -> Sentencia
 moverCabezal Norte = mapCabezal (sumaParOrdenado ( 0, 1))
 moverCabezal Sur   = mapCabezal (sumaParOrdenado ( 0,-1))
 moverCabezal Este  = mapCabezal (sumaParOrdenado ( 1, 0))
@@ -72,14 +82,29 @@ sumaParOrdenado (a, b) (c, d) = (a + c, b + d)
 --Punto 3.b--
 -------------
 
-poner :: Bolita -> Tablero -> Tablero
-poner bolita tablero = mapCeldas (map (ponerBolita bolita . cabezal $ tablero)) tablero
+poner :: Bolita -> Sentencia
+poner = mapBolitasEnCelda ponerBolitaEnCelda
 
-ponerBolita :: Bolita -> Cabezal -> Celda -> Celda
-ponerBolita bolita cabezal celda
-  | esEstaCelda cabezal celda = mapBolita (++ [bolita]) celda
-  | otherwise                 = celda
-
+ponerBolitaEnCelda :: Bolita -> Cabezal -> Celda -> Celda
+ponerBolitaEnCelda bolita = operarSiEsLaCelda (mapBolitas (++ [bolita])) bolita
 
 esEstaCelda :: Cabezal -> Celda -> Bool
-esEstaCelda cabezal celda = posicion celda == cabezal 
+esEstaCelda cabezal celda = posicion celda == cabezal
+
+-------------
+--Punto 3.c--
+-------------
+
+sacar :: Bolita -> Sentencia
+sacar = mapBolitasEnCelda sacarBolitaEnCelda
+
+sacarBolitaEnCelda :: Bolita -> Cabezal -> Celda -> Celda
+sacarBolitaEnCelda bolita = operarSiEsLaCelda (mapBolitas (delete bolita)) bolita
+
+
+
+
+
+
+
+
