@@ -103,7 +103,7 @@ sacarBolitaEnCelda bolita = operarSiEsLaCelda (mapBolitas (delete bolita)) bolit
 -------------
 
 ejecutarSentencias :: [Sentencia] -> Sentencia
-ejecutarSentencias sentencias tablero = foldr ($) tablero sentencias
+ejecutarSentencias sentencias tablero = foldl (flip ($) ) tablero sentencias
 
 repetir :: Int -> [Sentencia] -> Tablero -> Tablero
 repetir cantidad sentencias = ejecutarSentencias (concat . replicate cantidad $ sentencias)
@@ -174,3 +174,17 @@ hayBolita bolita = elem bolita . bolitas . celdaActual
 cantidadDeBolitas :: Bolita -> Tablero -> Int
 cantidadDeBolitas bolita = length . filter (== bolita) . bolitas . celdaActual 
 
+-----------
+--Punto 6--
+-----------
+
+programa :: [Sentencia] -> Tablero -> Tablero
+programa = ejecutarSentencias
+
+-----------
+--Punto 7--
+-----------
+
+program = programa [mover Norte, poner Negro, poner Negro, poner Azul, mover Norte, repetir 15 [poner Rojo, poner Azul], 
+            alternativa (hayBolita Verde) [mover Este, poner Negro] [mover Sur, mover Este, poner Azul], mover Este,
+            mientras ((<=9) . cantidadDeBolitas Verde) [poner Verde], poner Azul] (inicializarTablero (3,3))
