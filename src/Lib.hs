@@ -161,7 +161,16 @@ puedeMoverse unaDireccion tablero = betweenDupla (1, 1) (tamaño tablero) . cabe
 --Punto 5.b--
 -------------
 
-hayBolita :: Bolita -> Tablero -> Bool
-hayBolita bolita tablero = elem bolita . bolitas . head . filter (esEstaCelda (cabezal tablero)) $ celdas tablero
+celdaActual :: Tablero -> Celda
+celdaActual tablero = head . filter (esEstaCelda (cabezal tablero)) $ celdas tablero
 
+hayBolita :: Bolita -> Tablero -> Bool
+hayBolita bolita = elem bolita . bolitas . celdaActual
+
+-------------
+--Punto 5.c--
+-------------
+
+cantidadDeBolitas :: Bolita -> Tablero -> Int
+cantidadDeBolitas bolita = length . filter (== bolita) . bolitas . celdaActual 
 
