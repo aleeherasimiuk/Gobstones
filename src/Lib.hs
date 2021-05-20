@@ -64,28 +64,31 @@ crearCeldasRecursivo :: Posicion -> Tamaño -> [Celda] -> [Celda]
 crearCeldasRecursivo posicion tamanio celdas
     |hayQueAgregarColumna posicion tamanio = agregarColumna posicion tamanio celdas
     |hayQueAgregarFila    posicion tamanio = agregarFila posicion tamanio celdas
-    |otherwise                             = celdas ++ [Celda posicion []]
+    |otherwise                             = agregarUnaCeldaVacia posicion celdas
 
-quedanColumnas :: (Int , Int) -> (Int, Int) -> Bool
-quedanColumnas (a,b) (filas, columnas) = a * b < filas * columnas
+agregarColumna :: Posicion -> Tamaño -> [Celda] -> [Celda]
+agregarColumna = nuevaLinea (\(a, b) -> (a, b + 1))
+
+agregarFila :: Posicion -> Tamaño -> [Celda] -> [Celda]
+agregarFila = nuevaLinea (\(a, _) -> (a + 1, 1))
+
+nuevaLinea :: (Posicion -> Posicion) -> Posicion -> Tamaño -> [Celda] -> [Celda]
+nuevaLinea f posicion tamanio celdas = crearCeldasRecursivo (f posicion) tamanio (agregarUnaCeldaVacia posicion celdas)
+
+hayQueAgregarAlgo :: (Bool -> Bool) -> Posicion -> Tamaño -> Bool
+hayQueAgregarAlgo f posicion tamanio = faltanColumnas posicion tamanio && f (esLaUltimaColumna posicion tamanio)
+
+faltanColumnas :: (Int , Int) -> (Int, Int) -> Bool
+faltanColumnas (a,b) (filas, columnas) = a * b < filas * columnas
 
 esLaUltimaColumna :: (Int, Int) -> (Int, Int) -> Bool
 esLaUltimaColumna posicion tamanio = snd posicion == snd tamanio
 
-nuevaLinea :: (Posicion -> Posicion) -> Posicion -> Tamaño -> [Celda] -> [Celda]
-nuevaLinea f posicion = crearCeldasRecursivo (f posicion)
-
-agregarColumna :: Posicion -> Tamaño -> [Celda] -> [Celda]
-agregarColumna posicion tamanio celdas = nuevaLinea (\(a, b) -> (a, b + 1)) posicion tamanio (agregarUnaCeldaVacia posicion celdas)
-
-agregarFila :: Posicion -> Tamaño -> [Celda] -> [Celda]
-agregarFila posicion tamanio celdas = nuevaLinea (\(a, _) -> (a + 1, 1)) posicion tamanio (agregarUnaCeldaVacia posicion celdas)
-
 hayQueAgregarColumna :: Posicion -> Tamaño -> Bool
-hayQueAgregarColumna posicion tamanio = quedanColumnas posicion tamanio && not (esLaUltimaColumna posicion tamanio)
+hayQueAgregarColumna = hayQueAgregarAlgo not
 
 hayQueAgregarFila :: Posicion -> Tamaño -> Bool
-hayQueAgregarFila posicion tamanio = quedanColumnas posicion tamanio && esLaUltimaColumna posicion tamanio
+hayQueAgregarFila = hayQueAgregarAlgo id
 
 agregarUnaCeldaVacia :: Posicion -> [Celda] -> [Celda]
 agregarUnaCeldaVacia posicion celdas = celdas ++ [Celda posicion []]
