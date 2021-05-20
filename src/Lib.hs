@@ -49,8 +49,46 @@ esEstaCelda cabezal celda = posicion celda == cabezal
 ----------
 
 inicializarTablero :: Tamaño -> Tablero
-inicializarTablero (filas, columnas) = Tablero [Celda (x, y) [] | x <-[1 .. filas], y <- [1 .. columnas]] (filas, columnas) (1, 1)
+inicializarTablero (filas, columnas) = Tablero (inicializarCeldas' 3 3) (filas, columnas) (1, 1)
 
+inicializarCeldas :: Int -> Int -> [Celda]
+inicializarCeldas filas columnas = [Celda (x, y) [] | x <-[1 .. filas], y <- [1 .. columnas]]
+
+inicializarCeldas' :: Int -> Int -> [Celda]
+inicializarCeldas' filas columnas = map (flip Celda []) . concatMap (zip [1..filas] . repeat) $ [1.. columnas]
+
+inicializarCeldas'' :: Int-> Int -> [Celda]
+inicializarCeldas'' filas columnas = crearCeldasRecursivo (1, 1) (filas, columnas) []
+
+crearCeldasRecursivo :: Posicion -> Tamaño -> [Celda] -> [Celda]
+crearCeldasRecursivo posicion tamanio celdas
+    |hayQueAgregarColumna posicion tamanio = agregarColumna posicion tamanio celdas
+    |hayQueAgregarFila    posicion tamanio = agregarFila posicion tamanio celdas
+    |otherwise                             = celdas ++ [Celda posicion []]
+
+quedanColumnas :: (Int , Int) -> (Int, Int) -> Bool
+quedanColumnas (a,b) (filas, columnas) = a * b < filas * columnas
+
+esLaUltimaColumna :: (Int, Int) -> (Int, Int) -> Bool
+esLaUltimaColumna posicion tamanio = snd posicion == snd tamanio
+
+nuevaLinea :: (Posicion -> Posicion) -> Posicion -> Tamaño -> [Celda] -> [Celda]
+nuevaLinea f posicion = crearCeldasRecursivo (f posicion)
+
+agregarColumna :: Posicion -> Tamaño -> [Celda] -> [Celda]
+agregarColumna posicion tamanio celdas = nuevaLinea (\(a, b) -> (a, b + 1)) posicion tamanio (agregarUnaCeldaVacia posicion celdas)
+
+agregarFila :: Posicion -> Tamaño -> [Celda] -> [Celda]
+agregarFila posicion tamanio celdas = nuevaLinea (\(a, _) -> (a + 1, 1)) posicion tamanio (agregarUnaCeldaVacia posicion celdas)
+
+hayQueAgregarColumna :: Posicion -> Tamaño -> Bool
+hayQueAgregarColumna posicion tamanio = quedanColumnas posicion tamanio && not (esLaUltimaColumna posicion tamanio)
+
+hayQueAgregarFila :: Posicion -> Tamaño -> Bool
+hayQueAgregarFila posicion tamanio = quedanColumnas posicion tamanio && esLaUltimaColumna posicion tamanio
+
+agregarUnaCeldaVacia :: Posicion -> [Celda] -> [Celda]
+agregarUnaCeldaVacia posicion celdas = celdas ++ [Celda posicion []]
 
 -------------
 --Punto 3.a--
@@ -172,7 +210,7 @@ hayBolita bolita = elem bolita . bolitas . celdaActual
 -------------
 
 cantidadDeBolitas :: Bolita -> Tablero -> Int
-cantidadDeBolitas bolita = length . filter (== bolita) . bolitas . celdaActual 
+cantidadDeBolitas bolita = length . filter (== bolita) . bolitas . celdaActual
 
 -----------
 --Punto 6--
@@ -185,6 +223,6 @@ programa = ejecutarSentencias
 --Punto 7--
 -----------
 
-program = programa [mover Norte, poner Negro, poner Negro, poner Azul, mover Norte, repetir 15 [poner Rojo, poner Azul], 
+program = programa [mover Norte, poner Negro, poner Negro, poner Azul, mover Norte, repetir 15 [poner Rojo, poner Azul],
             alternativa (hayBolita Verde) [mover Este, poner Negro] [mover Sur, mover Este, poner Azul], mover Este,
             mientras ((<=9) . cantidadDeBolitas Verde) [poner Verde], poner Azul] (inicializarTablero (3,3))
