@@ -75,9 +75,6 @@ agregarFila = nuevaLinea (\(a, _) -> (a + 1, 1))
 nuevaLinea :: (Posicion -> Posicion) -> Posicion -> Tamaño -> [Celda] -> [Celda]
 nuevaLinea f posicion tamanio celdas = crearCeldasRecursivo (f posicion) tamanio (agregarUnaCeldaVacia posicion celdas)
 
-hayQueAgregarAlgo :: (Bool -> Bool) -> Posicion -> Tamaño -> Bool
-hayQueAgregarAlgo f posicion tamanio = faltanColumnas posicion tamanio && f (esLaUltimaColumna posicion tamanio)
-
 faltanColumnas :: (Int , Int) -> (Int, Int) -> Bool
 faltanColumnas (a,b) (filas, columnas) = a * b < filas * columnas
 
@@ -89,6 +86,9 @@ hayQueAgregarColumna = hayQueAgregarAlgo not
 
 hayQueAgregarFila :: Posicion -> Tamaño -> Bool
 hayQueAgregarFila = hayQueAgregarAlgo id
+
+hayQueAgregarAlgo :: (Bool -> Bool) -> Posicion -> Tamaño -> Bool
+hayQueAgregarAlgo f posicion tamanio = faltanColumnas posicion tamanio && f (esLaUltimaColumna posicion tamanio)
 
 agregarUnaCeldaVacia :: Posicion -> [Celda] -> [Celda]
 agregarUnaCeldaVacia posicion celdas = celdas ++ [Celda posicion []]
