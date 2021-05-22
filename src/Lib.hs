@@ -49,7 +49,7 @@ esEstaCelda cabezal celda = posicion celda == cabezal
 ----------
 
 inicializarTablero :: Tamaño -> Tablero
-inicializarTablero (filas, columnas) = Tablero (inicializarCeldas' 3 3) (filas, columnas) (1, 1)
+inicializarTablero (filas, columnas) = Tablero (inicializarCeldas''' 3 3) (filas, columnas) (1, 1)
 
 inicializarCeldas :: Int -> Int -> [Celda]
 inicializarCeldas filas columnas = [Celda (x, y) [] | x <-[1 .. filas], y <- [1 .. columnas]]
@@ -92,6 +92,12 @@ hayQueAgregarAlgo f posicion tamanio = faltanColumnas posicion tamanio && f (esL
 
 agregarUnaCeldaVacia :: Posicion -> [Celda] -> [Celda]
 agregarUnaCeldaVacia posicion celdas = celdas ++ [Celda posicion []]
+
+inicializarCeldas''' :: Int -> Int -> [Celda]
+inicializarCeldas''' filas columnas = map (flip Celda []) (celdasPara filas columnas)
+
+celdasPara :: Int -> Int -> [Posicion]
+celdasPara filas columnas = (,) <$> [1..filas] <*> [1..columnas]
 
 -------------
 --Punto 3.a--
